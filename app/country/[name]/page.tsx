@@ -1,3 +1,4 @@
+import CountryCard from "@/app/components/country-card/CountryCard";
 import { Country } from "@/app/page";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,12 +11,31 @@ async function getCountryByName(name: string): Promise<Country> {
   return country[0];
 }
 
+async function getCountryBordersByName(name: string) {
+  const responce = await fetch("https://restcountries.com/v3.1/all");
+  const countries: Country[] = await responce.json();
+
+  const country = countries.find(
+    (country: Country) => country.name.common === name
+  )!;
+  return country.borders?.map((border) => {
+    const borderCountry = countries.find((country) => country.cca3 === border)!
+    return {
+        name: borderCountry.name.common,
+        rusName: borderCountry.translations.rus.common,
+        flag: borderCountry.flags.svg,
+        flagAlt: borderCountry.flags.alt, 
+    }
+  })
+}
+
 async function CountryDetail({
   params: { name },
 }: {
   params: { name: string };
 }) {
   const country = await getCountryByName(name);
+  const borderCountries = await getCountryBordersByName(decodeURI(name));
   const formatter = Intl.NumberFormat("rus", { notation: "compact" });
   return (
     <section className="flex flex-col container">
@@ -55,14 +75,20 @@ async function CountryDetail({
           )}
         </section>
         <div className="relative h-auto w-96 shadow-md">
-          <Image
-            src={country.flags.svg}
-            alt={country.flags.alt}
-            fill
-            className="object-cover"
-          />
+          <Image src={country.flags.svg} alt={country.flags.alt} fill />
         </div>
       </article>
+
+      <section>
+      <h3 className="mt-12 text-2xl font-semibold text-gray-800">
+          Neighbour countries
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full container gap-2">
+                {borderCountries?.map((border) =>(
+                    <CountryCard key={border.name} {...border} />
+                ))}
+        </div>
+      </section>
     </section>
   );
 }
