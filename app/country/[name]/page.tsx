@@ -46,7 +46,7 @@ async function CountryDetail({
         <Image src="/arrow.svg" alt="go back home" width={24} height={24} />
         Back
       </Link>
-      <article className=" flex justify-between min-w-full p-10 bg-white rounded-xl">
+      <article className=" flex md:flex-row flex-col justify-between min-w-full p-10 bg-white rounded-xl">
         <section>
           {country.capital && (
             <h2 className="text-xl text-gray-800 mt-3">
@@ -74,7 +74,7 @@ async function CountryDetail({
             </h2>
           )}
         </section>
-        <div className="relative h-auto w-96 shadow-md">
+        <div className="relative h-48 my-2 md:h-auto w-96 shadow-md md:order-last order-first">
           <Image src={country.flags.svg} alt={country.flags.alt} fill />
         </div>
       </article>
